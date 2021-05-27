@@ -1,0 +1,24 @@
+{
+  "name": "8-bit-emulator",
+  "version": "1.0.0",
+  "description": "CHIP-8 is an interpreted programming language, developed by Joseph Weisbecker. It was initially used on the COSMAC VIP and Telmac 1800 8-bit microcomputers in the mid-1970s. CHIP-8 programs are run on a CHIP-8 virtual machine. It was made to allow video games to be more easily programmed for these computers.",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micrus/8bit-js-emulator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/micrus/8bit-js-emulator/issues"
+  },
+  "homepage": "https://github.com/micrus/8bit-js-emulator#readme",
+  "dependencies": {
+    "webpack": "^5.38.0",
+    "webpack-cli": "^4.7.0"
+  }
+}
