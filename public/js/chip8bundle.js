@@ -10,12 +10,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Chip8": () => (/* binding */ Chip8)
 /* harmony export */ });
 /* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
+
 
 
 class Chip8{
     constructor(){
         console.log("Create a new Chip8");
         this.display = new _Display__WEBPACK_IMPORTED_MODULE_0__.Display();
+        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_1__.Memory();
     }
 }
 
@@ -30,49 +33,52 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 
 
-class Display{
-    constructor(){
-        console.log("Create a new Display");
-        this.screen = document.querySelector('canvas');
-        this.screen.width = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
-        this.screen.height = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
-        this.context = this.screen.getContext('2d');
-        this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
-        this.frameBuffer = [];
-        this.reset();
-        this.drawBuffer();
+class Display {
+  constructor() {
+    console.log("Create a new Display");
+    this.screen = document.querySelector("canvas");
+    this.screen.width = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
+    this.screen.height = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
+    this.context = this.screen.getContext("2d");
+    this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+    this.frameBuffer = [];
+    this.reset();
+    this.drawBuffer();
+  }
+
+  reset() {
+    for (let i = 0; i < _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; i++) {
+      this.frameBuffer.push([]);
+      for (let j = 0; j < _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; j++) {
+        this.frameBuffer[i].push(0);
+      }
     }
+    this.context.fillRect(0, 0, this.screen.width, this.screen.height);
+  }
 
-    reset(){
-        for(let i=0; i < _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; i++){
-            this.frameBuffer.push([]);
-            for(let j=0; j<_constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; j++){
-                this.frameBuffer[i].push(0);
-            }
-        }
-        this.context.fillRect(0,0, this.screen.width, this.screen.height);
+  drawBuffer() {
+    for (let h = 0; h < _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; h++) {
+      for (let w = 0; w < _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; w++) {
+        this.drawPixel(h, w, this.frameBuffer[h][w]);
+      }
     }
+  }
 
-    drawBuffer(){
-        for(let h=0; h < _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; h++){
-            for(let w=0; w<_constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; w++){
-                this.drawPixel(h,w,this.frameBuffer[h][w]);
-            }
-        }
+  drawPixel(h, w, value) {
+    if (value) {
+      this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.COLOR;
+    } else {
+      this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
     }
-
-    drawPixel(h,w,value){
-        if(value){
-            this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.COLOR;
-        } else {
-            this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
-        }
-        this.context.fillRect(w*_constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY,h*_constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY, _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY, _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY);
-    }
-
-
-
+    this.context.fillRect(
+      w * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY,
+      h * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY,
+      _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY,
+      _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY
+    );
+  }
 }
+
 
 /***/ }),
 /* 3 */
@@ -91,6 +97,54 @@ const DISPLAY_HEIGHT = 32;
 const DISPLAY_MULTIPLY = 10;
 const BG_COLOR = '#000';
 const COLOR = '#3f6';
+
+/***/ }),
+/* 4 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Memory": () => (/* binding */ Memory)
+/* harmony export */ });
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+
+
+class Memory{
+    constructor(){
+        this.memory = new Uint8Array(_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__.MEMORY_SIZE);
+        this.reset();
+    }
+
+    reset(){
+        this.memory.fill(0);
+    }
+
+    getMemory(index){
+        this.assertMemory(index);
+        return this.memory[index];
+    }
+
+    setMemory(index, value){
+        this.assertMemory(index);
+        this.memory[index]= value;
+    }
+
+    assertMemory(index){
+        console.assert(index >= 0 && index < _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__.MEMORY_SIZE, `Error trying to access memory out of bounds at index ${index}`);
+    }
+}
+
+/***/ }),
+/* 5 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MEMORY_SIZE": () => (/* binding */ MEMORY_SIZE),
+/* harmony export */   "LOAD_PROGRAM_ADDRESS": () => (/* binding */ LOAD_PROGRAM_ADDRESS)
+/* harmony export */ });
+const MEMORY_SIZE = 4095;
+const LOAD_PROGRAM_ADDRESS = 0x200;
 
 /***/ })
 /******/ 	]);
@@ -157,6 +211,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
+
 })();
 
 /******/ })()
