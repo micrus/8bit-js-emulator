@@ -38,8 +38,40 @@ class Display{
         this.screen.height = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
         this.context = this.screen.getContext('2d');
         this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+        this.frameBuffer = [];
+        this.reset();
+        this.drawBuffer();
+    }
+
+    reset(){
+        for(let i=0; i < _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; i++){
+            this.frameBuffer.push([]);
+            for(let j=0; j<_constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; j++){
+                this.frameBuffer[i].push(0);
+            }
+        }
         this.context.fillRect(0,0, this.screen.width, this.screen.height);
     }
+
+    drawBuffer(){
+        for(let h=0; h < _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; h++){
+            for(let w=0; w<_constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; w++){
+                this.drawPixel(h,w,this.frameBuffer[h][w]);
+            }
+        }
+    }
+
+    drawPixel(h,w,value){
+        if(value){
+            this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.COLOR;
+        } else {
+            this.context.fillStyle = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+        }
+        this.context.fillRect(w*_constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY,h*_constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY, _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY, _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY);
+    }
+
+
+
 }
 
 /***/ }),
