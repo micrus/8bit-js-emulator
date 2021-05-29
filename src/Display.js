@@ -8,7 +8,7 @@ import {
 
 export class Display {
   constructor() {
-    console.log("Create a new Display");
+    console.log("Create new Display");
     this.screen = document.querySelector("canvas");
     this.screen.width = DISPLAY_WIDTH * DISPLAY_MULTIPLY;
     this.screen.height = DISPLAY_HEIGHT * DISPLAY_MULTIPLY;

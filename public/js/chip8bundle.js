@@ -10,8 +10,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Chip8": () => (/* binding */ Chip8)
 /* harmony export */ });
 /* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
-/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
+/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
+/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+
 
 
 
@@ -20,8 +22,14 @@ class Chip8{
     constructor(){
         console.log("Create a new Chip8");
         this.display = new _Display__WEBPACK_IMPORTED_MODULE_0__.Display();
-        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_1__.Memory();
-        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_2__.Registers();
+        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_2__.Memory();
+        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_3__.Registers();
+        this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_1__.Keyboard();
+    }
+
+
+    async sleep(ms = 1000){
+        return new Promise((resolve)=> setTimeout(resolve,ms));
     }
 }
 
@@ -38,7 +46,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class Display {
   constructor() {
-    console.log("Create a new Display");
+    console.log("Create new Display");
     this.screen = document.querySelector("canvas");
     this.screen.width = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
     this.screen.height = _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayContants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
@@ -114,6 +122,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class Memory{
     constructor(){
+        console.log("Create new memory");
         this.memory = new Uint8Array(_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__.MEMORY_SIZE);
         this.reset();
     }
@@ -219,6 +228,61 @@ __webpack_require__.r(__webpack_exports__);
 const NUMBER_OF_REGISTERS = 16;
 const STACK_SIZE = 16;
 
+/***/ }),
+/* 8 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Keyboard": () => (/* binding */ Keyboard)
+/* harmony export */ });
+/* harmony import */ var _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+
+
+class Keyboard{
+    constructor(){
+        console.log("Create new Keyboard");
+        this.keys = new Array(_constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.NUMBER_OF_KEYS).fill(false);
+        document.addEventListener('keydown', (event)=>this.keydown(event.key));
+        document.addEventListener('keyup', (event)=>this.keyup(event.key));
+
+    }
+
+    keydown(key){
+        const keyIndex = _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.KEYMAP.findIndex((mapKey)=> mapKey === key.toLowerCase());
+        if (keyIndex>-1){
+            this.keys[keyIndex] = true;
+        }
+    }
+
+    keyup(key){
+        const keyIndex = _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.KEYMAP.findIndex((mapKey)=> mapKey === key.toLowerCase());
+        if (keyIndex>-1){
+            this.keys[keyIndex] = false;
+        }
+    }
+
+    isKeyDown(index){
+        return this.keys[index];
+    }
+
+    hasKeyDown(){
+        return this.keys.findIndex((keyValue)=>keyValue) != -1;
+    }
+}
+
+/***/ }),
+/* 9 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "NUMBER_OF_KEYS": () => (/* binding */ NUMBER_OF_KEYS),
+/* harmony export */   "KEYMAP": () => (/* binding */ KEYMAP)
+/* harmony export */ });
+const NUMBER_OF_KEYS = 16;
+const KEYMAP = ['1','2','3','q','w','e','a','s','d','x','z','c','4','r','f','v'];
+
 /***/ })
 /******/ 	]);
 /************************************************************************/
@@ -284,6 +348,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
+runChip8();
+async function runChip8(){
+    while(1){
+        let hkd = chip8.keyboard.hasKeyDown();
+        let ikd =chip8.keyboard.isKeyDown(0);
+        console.log('haskeydown',hkd,'iskeydown',ikd);
+        await chip8.sleep();
+    }
+}
 
 })();
 
