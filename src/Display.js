@@ -4,7 +4,7 @@ import {
   DISPLAY_HEIGHT,
   DISPLAY_MULTIPLY,
   DISPLAY_WIDTH,
-} from "./constants/displayContants";
+} from "./constants/displayConstants";
 
 export class Display {
   constructor() {

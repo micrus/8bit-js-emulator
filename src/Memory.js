@@ -2,7 +2,7 @@ import { MEMORY_SIZE } from "./constants/memoryConstants";
 
 export class Memory{
     constructor(){
-        console.log("Create new memory");
+        console.log("Create new Memory");
         this.memory = new Uint8Array(MEMORY_SIZE);
         this.reset();
     }
