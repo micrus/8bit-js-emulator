@@ -25,11 +25,12 @@ __webpack_require__.r(__webpack_exports__);
 class Chip8{
     constructor(){
         console.log("Create a new Chip8");
-        this.display = new _Display__WEBPACK_IMPORTED_MODULE_2__.Display();
         this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_4__.Memory();
+        this.loadCharSet();
         this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_5__.Registers();
         this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_3__.Keyboard();
-        this.loadCharSet();
+        this.display = new _Display__WEBPACK_IMPORTED_MODULE_2__.Display(this.memory);
+
     }
 
     loadCharSet(){
@@ -50,11 +51,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Display": () => (/* binding */ Display)
 /* harmony export */ });
 /* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+
+
 
 
 class Display {
-  constructor() {
+  constructor(memory) {
     console.log("Create new Display");
+    this.memory = memory;
     this.screen = document.querySelector("canvas");
     this.screen.width = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
     this.screen.height = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY;
@@ -96,6 +101,18 @@ class Display {
       _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY
     );
   }
+
+  drawSprite(x, y, spriteLocation, spriteLen){
+    for(let h = 0; h<spriteLen; h++){
+      const line = this.memory.memory[spriteLocation+h];
+      for(let w=0; w<_constants_charSetConstants__WEBPACK_IMPORTED_MODULE_1__.CHAR_SET_WIDTH; w++){
+        const bitToCheck = (0b10000000 >> w);
+        const value = line & bitToCheck;
+        this.drawPixel(h+y, x+w, value);
+      }
+    }
+  }
+
 }
 
 
@@ -299,8 +316,10 @@ const STACK_SIZE = 16;
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "CHAR_SET_WIDTH": () => (/* binding */ CHAR_SET_WIDTH),
 /* harmony export */   "CHAR_SET": () => (/* binding */ CHAR_SET)
 /* harmony export */ });
+const CHAR_SET_WIDTH = 8;
 const CHAR_SET = [
     0xF0, 0x90, 0x90, 0x90, 0xF0,		// 0
 	0x20, 0x60, 0x20, 0x20, 0x70,		// 1
@@ -388,11 +407,7 @@ const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
 runChip8();
 
 async function runChip8(){
-   console.log(chip8.memory.getMemory(0).toString(16));
-   console.log(chip8.memory.getMemory(1).toString(16));
-   console.log(chip8.memory.getMemory(2).toString(16));
-   console.log(chip8.memory.getMemory(3).toString(16));
-   console.log(chip8.memory.getMemory(4).toString(16));
+    chip8.display.drawSprite(1,1,0,5); 
 }
 
 })();

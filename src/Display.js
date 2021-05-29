@@ -6,9 +6,12 @@ import {
   DISPLAY_WIDTH,
 } from "./constants/displayConstants";
 
+import {CHAR_SET_WIDTH} from "./constants/charSetConstants"
+
 export class Display {
-  constructor() {
+  constructor(memory) {
     console.log("Create new Display");
+    this.memory = memory;
     this.screen = document.querySelector("canvas");
     this.screen.width = DISPLAY_WIDTH * DISPLAY_MULTIPLY;
     this.screen.height = DISPLAY_HEIGHT * DISPLAY_MULTIPLY;
@@ -50,4 +53,16 @@ export class Display {
       DISPLAY_MULTIPLY
     );
   }
+
+  drawSprite(x, y, spriteLocation, spriteLen){
+    for(let h = 0; h<spriteLen; h++){
+      const line = this.memory.memory[spriteLocation+h];
+      for(let w=0; w<CHAR_SET_WIDTH; w++){
+        const bitToCheck = (0b10000000 >> w);
+        const value = line & bitToCheck;
+        this.drawPixel(h+y, x+w, value);
+      }
+    }
+  }
+
 }
