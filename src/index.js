@@ -1,8 +1,26 @@
-import {Chip8} from "./Chip8"
+import { Chip8 } from "./Chip8";
 
 const chip8 = new Chip8();
+chip8.registers.ST = 10;
 runChip8();
 
-async function runChip8(){
-    chip8.display.drawSprite(1,1,0,5); 
+
+
+
+async function runChip8() {
+  while (1) {
+    await chip8.sleep(200);
+    if (chip8.registers.DT > 0) {
+      await chip8.sleep();
+      chip8.registers.DT--;
+    }
+    if (chip8.registers.ST > 0) {
+      chip8.soundCard.enableSound();
+      await chip8.sleep();
+      chip8.registers.ST--;
+    }
+    if (chip8.registers.ST === 0) {
+      chip8.soundCard.disableSound();
+    }
+  }
 }
