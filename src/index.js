@@ -8,7 +8,11 @@ runChip8();
 
 
 async function runChip8() {
-chip8.disassembler.disassemble(0x2f00);
+chip8.disassembler.disassemble(0xd123);
+
+
+
+
 
 
 
