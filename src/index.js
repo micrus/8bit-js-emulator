@@ -14,7 +14,7 @@ const romBuffer = new Uint8Array(arrayBuffer);
 const chip8 = new Chip8(romBuffer);
 
 
-chip8.execute(0x1006);
+chip8.execute(0x21aa);
 console.log('pc', chip8.registers.PC, 'sp', chip8.registers.SP);
 
 

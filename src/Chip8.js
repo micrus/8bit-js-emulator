@@ -47,6 +47,10 @@ export class Chip8{
             case 'JP_ADDR':
                 this.registers.PC = args[0];
                 break;
+            case 'CALL_ADDR':
+                this.registers.stackPush(this.registers.PC);
+                this.registers.PC = args[0];
+                break;
     
             default:
                 console.error(`Instuction with ${id} not found.`,instruction,args);
