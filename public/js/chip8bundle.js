@@ -29,11 +29,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Chip8{
-    constructor(){
+    constructor(romBuffer){
         console.log("Create a new Chip8");
+        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_7__.Registers();
         this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_6__.Memory();
         this.loadCharSet();
-        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_7__.Registers();
+        this.loadRom(romBuffer);
         this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_5__.Keyboard();
         this.display = new _Display__WEBPACK_IMPORTED_MODULE_4__.Display(this.memory);
         this.soundCard = new _SoundCard__WEBPACK_IMPORTED_MODULE_8__.SoundCard();
@@ -43,6 +44,12 @@ class Chip8{
 
     loadCharSet(){
         this.memory.memory.set(_constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__.CHAR_SET,_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.CHAR_SET_ADDRESS);
+    }
+
+    loadRom(romBuffer){
+        console.assert(romBuffer.length + _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS<=_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE, "This rom is too large")
+        this.memory.memory.set(romBuffer, _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS);
+        this.registers.PC = _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS;
     }
 
     async sleep(ms = _constants_registersConstants__WEBPACK_IMPORTED_MODULE_2__.TIMER_60_HZ){
@@ -341,14 +348,95 @@ const INSTRUCTION_SET = [
         pattern: 0xd000,
         args : [MASK_X,MASK_Y,MASK_N]
     },
-/*     {
-        key: ,
-        id: '',
-        name: '',
-        mask: 0x,
-        pattern: 0x,
-        args : []
-    }, */
+    {
+        key: 24,
+        id: 'SKP_VX',
+        name: 'SKP',
+        mask: 0xf0ff,
+        pattern: 0xe09e,
+        args : [MASK_X]
+    },
+    {
+        key: 25,
+        id: 'SKNP_VX',
+        name: 'SKNP',
+        mask: 0xf0ff,
+        pattern: 0xe0a1,
+        args : [MASK_X]
+    },
+    {
+        key: 26,
+        id: 'LD_VX_DT',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf007,
+        args : [MASK_X]
+    },
+    {
+        key: 27,
+        id: 'LD_VX_K',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf00a,
+        args : [MASK_X]
+    },
+    {
+        key: 28,
+        id: 'LD_DT_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf015,
+        args : [MASK_X]
+    }, 
+    {
+        key: 29,
+        id: 'LD_ST_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf018,
+        args : [MASK_X]
+    }, 
+    {
+        key: 30,
+        id: 'ADD_I_VX',
+        name: 'ADD',
+        mask: 0xf0ff,
+        pattern: 0xf01e,
+        args : [MASK_X]
+    }, 
+    {
+        key: 31,
+        id: 'LD_F_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf029,
+        args : [MASK_X]
+    }, 
+    {
+        key: 32,
+        id: 'LD_B_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf033,
+        args : [MASK_X]
+    }, 
+    {
+        key: 33,
+        id: 'LD_I_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf055,
+        args : [MASK_X]
+    }, 
+    {
+        key: 34,
+        id: 'LD_VX_I',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf065,
+        args : [MASK_X]
+    }, 
+
 ];
 
 /***/ }),
@@ -532,6 +620,12 @@ class Memory{
 
     assertMemory(index){
         console.assert(index >= 0 && index < _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__.MEMORY_SIZE, `Error trying to access memory out of bounds at index ${index}`);
+    }
+
+    getOpcode(index){
+        const highByte = this.getMemory(index);
+        const lowByte = this.getMemory(index + 1);
+        return (highByte << 8) | lowByte;
     }
 }
 
@@ -723,7 +817,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Chip8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
 
-const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
 
 runChip8();
 
@@ -731,7 +824,14 @@ runChip8();
 
 
 async function runChip8() {
-chip8.disassembler.disassemble(0xd123);
+
+const rom = await fetch('./roms/test_opcode.ch8');
+const arrayBuffer = await rom.arrayBuffer();
+const romBuffer = new Uint8Array(arrayBuffer);
+const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
+console.log(romBuffer);
+console.log(chip8.memory.getOpcode(0x200).toString(16));
+console.log(chip8.memory.getOpcode(0x202).toString(16));
 
 
 

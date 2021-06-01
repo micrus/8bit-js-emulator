@@ -194,12 +194,93 @@ export const INSTRUCTION_SET = [
         pattern: 0xd000,
         args : [MASK_X,MASK_Y,MASK_N]
     },
-/*     {
-        key: ,
-        id: '',
-        name: '',
-        mask: 0x,
-        pattern: 0x,
-        args : []
-    }, */
+    {
+        key: 24,
+        id: 'SKP_VX',
+        name: 'SKP',
+        mask: 0xf0ff,
+        pattern: 0xe09e,
+        args : [MASK_X]
+    },
+    {
+        key: 25,
+        id: 'SKNP_VX',
+        name: 'SKNP',
+        mask: 0xf0ff,
+        pattern: 0xe0a1,
+        args : [MASK_X]
+    },
+    {
+        key: 26,
+        id: 'LD_VX_DT',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf007,
+        args : [MASK_X]
+    },
+    {
+        key: 27,
+        id: 'LD_VX_K',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf00a,
+        args : [MASK_X]
+    },
+    {
+        key: 28,
+        id: 'LD_DT_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf015,
+        args : [MASK_X]
+    }, 
+    {
+        key: 29,
+        id: 'LD_ST_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf018,
+        args : [MASK_X]
+    }, 
+    {
+        key: 30,
+        id: 'ADD_I_VX',
+        name: 'ADD',
+        mask: 0xf0ff,
+        pattern: 0xf01e,
+        args : [MASK_X]
+    }, 
+    {
+        key: 31,
+        id: 'LD_F_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf029,
+        args : [MASK_X]
+    }, 
+    {
+        key: 32,
+        id: 'LD_B_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf033,
+        args : [MASK_X]
+    }, 
+    {
+        key: 33,
+        id: 'LD_I_VX',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf055,
+        args : [MASK_X]
+    }, 
+    {
+        key: 34,
+        id: 'LD_VX_I',
+        name: 'LD',
+        mask: 0xf0ff,
+        pattern: 0xf065,
+        args : [MASK_X]
+    }, 
+
 ];
