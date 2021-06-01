@@ -52,6 +52,28 @@ class Chip8{
         this.registers.PC = _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS;
     }
 
+    execute(opcode){
+        const {instruction, args} = this.disassembler.disassemble(opcode);
+        const {id} = instruction;
+        console.log('i', instruction,'a',args,'id',id);
+
+        switch (id) {
+            case 'CLS':
+                this.display.reset();
+                break;
+            case 'RET':
+                this.registers.PC = this.registers.stackPop();
+                break;
+            case 'JP_ADDR':
+                this.registers.PC = args[0];
+                break;
+    
+            default:
+                console.error(`Instuction with ${id} not found.`,instruction,args);
+        }
+    }
+
+
     async sleep(ms = _constants_registersConstants__WEBPACK_IMPORTED_MODULE_2__.TIMER_60_HZ){
         return new Promise((resolve)=> setTimeout(resolve,ms));
     }
@@ -133,7 +155,7 @@ class Disassembler{
     disassemble(opcode){
         const instruction = _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__.INSTRUCTION_SET.find(instruction => (opcode & instruction.mask) === instruction.pattern);
         const args = instruction.args.map(arg => (opcode & arg.mask)>>arg.shift);
-        console.log('Instruction:',instruction, 'Args:',args);
+        return {instruction, args};
     }
 }
 
@@ -198,7 +220,7 @@ const INSTRUCTION_SET = [
     },
     {
         key: 5,
-        id: 'SE_VX_NN',
+        id: 'SE_VX_KK',
         name: 'SE',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0x3000,
@@ -206,7 +228,7 @@ const INSTRUCTION_SET = [
     },
     {
         key: 6,
-        id: 'SNE_VX_NN',
+        id: 'SNE_VX_KK',
         name: 'SNE',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0x4000,
@@ -468,6 +490,7 @@ class Display {
   }
 
   reset() {
+    console.log('resetting!');
     for (let i = 0; i < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; i++) {
       this.frameBuffer.push([]);
       for (let j = 0; j < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; j++) {
@@ -829,9 +852,10 @@ const rom = await fetch('./roms/test_opcode.ch8');
 const arrayBuffer = await rom.arrayBuffer();
 const romBuffer = new Uint8Array(arrayBuffer);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
-console.log(romBuffer);
-console.log(chip8.memory.getOpcode(0x200).toString(16));
-console.log(chip8.memory.getOpcode(0x202).toString(16));
+
+
+chip8.execute(0x1006);
+console.log('pc', chip8.registers.PC, 'sp', chip8.registers.SP);
 
 
 

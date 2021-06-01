@@ -12,9 +12,10 @@ const rom = await fetch('./roms/test_opcode.ch8');
 const arrayBuffer = await rom.arrayBuffer();
 const romBuffer = new Uint8Array(arrayBuffer);
 const chip8 = new Chip8(romBuffer);
-console.log(romBuffer);
-console.log(chip8.memory.getOpcode(0x200).toString(16));
-console.log(chip8.memory.getOpcode(0x202).toString(16));
+
+
+chip8.execute(0x1006);
+console.log('pc', chip8.registers.PC, 'sp', chip8.registers.SP);
 
 
 

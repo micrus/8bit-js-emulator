@@ -32,6 +32,28 @@ export class Chip8{
         this.registers.PC = LOAD_PROGRAM_ADDRESS;
     }
 
+    execute(opcode){
+        const {instruction, args} = this.disassembler.disassemble(opcode);
+        const {id} = instruction;
+        console.log('i', instruction,'a',args,'id',id);
+
+        switch (id) {
+            case 'CLS':
+                this.display.reset();
+                break;
+            case 'RET':
+                this.registers.PC = this.registers.stackPop();
+                break;
+            case 'JP_ADDR':
+                this.registers.PC = args[0];
+                break;
+    
+            default:
+                console.error(`Instuction with ${id} not found.`,instruction,args);
+        }
+    }
+
+
     async sleep(ms = TIMER_60_HZ){
         return new Promise((resolve)=> setTimeout(resolve,ms));
     }

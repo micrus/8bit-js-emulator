@@ -23,6 +23,7 @@ export class Display {
   }
 
   reset() {
+    console.log('resetting!');
     for (let i = 0; i < DISPLAY_HEIGHT; i++) {
       this.frameBuffer.push([]);
       for (let j = 0; j < DISPLAY_WIDTH; j++) {
