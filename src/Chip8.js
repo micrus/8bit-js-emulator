@@ -51,7 +51,63 @@ export class Chip8{
                 this.registers.stackPush(this.registers.PC);
                 this.registers.PC = args[0];
                 break;
-    
+            case 'SE_VX_KK':
+                if(this.registers.V[args[0]] === args[1]){
+                    this.registers.PC += 2;
+                }
+                break;
+            case 'SNE_VX_KK':
+                if(this.registers.V[args[0]] !== args[1]){
+                    this.registers.PC += 2;
+                }
+                break;
+            case 'SE_VX_VY':
+                if(this.registers.V[args[0]] === this.registers.V[args[1]]){
+                    this.registers.PC += 2;
+                }
+                break;
+            case 'LD_VX_KK':
+                this.registers.V[args[0]]=args[1];
+                break;
+            case 'ADD_VX_KK':
+                this.registers.V[args[0]] += args[1];
+                break;
+            case 'LD_VX_VY':
+                this.registers.V[args[0]] = this.registers.V[args[1]];
+                break;
+            case 'OR_VX_VY':
+                this.registers.V[args[0]] |= this.registers.V[args[1]]; 
+                break;
+            case 'AND_VX_VY':
+                this.registers.V[args[0]] &= this.registers.V[args[1]]; 
+                break;            
+            case 'XOR_VX_VY':
+                this.registers.V[args[0]] ^= this.registers.V[args[1]]; 
+                break;              
+            case 'ADD_VX_VY':
+                this.registers.V[0x0f] = (this.registers.V[args[0]]+this.registers.V[args[1]]>0xff)?1:0;
+                this.registers.V[args[0]]+=this.registers.V[args[1]];
+                break;              
+            case 'SUB_VX_VY':
+                this.registers.V[0x0f] = (this.registers.V[args[0]]>this.registers.V[args[1]])?1:0;
+                this.registers.V[args[0]]-=this.registers.V[args[1]];
+                break; 
+            case 'SHR_VX_VY':
+                this.registers.V[0x0f] = (this.registers.V[args[0]] & 0x01);
+                this.registers.V[args[0]] >>= 1;
+                break;
+            case 'SUBN_VX_VY':
+                this.registers.V[0x0f] = (this.registers.V[args[1]]+this.registers.V[args[0]]>0xff)?1:0;
+                this.registers.V[args[0]] = this.registers.V[args[1]]-this.registers.V[args[0]];
+                break;
+            case 'SHL_VX_VY':
+                this.registers.V[0x0f] = Boolean(this.registers.V[args[0]] & 0x80);
+                this.registers.V[args[0]] <<= 1;
+                break;   
+                
+                
+
+
             default:
                 console.error(`Instuction with ${id} not found.`,instruction,args);
         }
