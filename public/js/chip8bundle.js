@@ -10,14 +10,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Chip8": () => (/* binding */ Chip8)
 /* harmony export */ });
 /* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
-/* harmony import */ var _Disassembler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
-/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
-/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
-/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(11);
-/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(12);
-/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(13);
+/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
+/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+/* harmony import */ var _Disassembler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
+/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
+/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9);
+/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(11);
+/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(12);
+/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(13);
+
 
 
 
@@ -31,28 +33,28 @@ __webpack_require__.r(__webpack_exports__);
 class Chip8{
     constructor(romBuffer){
         console.log("Create a new Chip8");
-        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_7__.Registers();
-        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_6__.Memory();
+        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_8__.Registers();
+        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_7__.Memory();
         this.loadCharSet();
         this.loadRom(romBuffer);
-        this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_5__.Keyboard();
-        this.display = new _Display__WEBPACK_IMPORTED_MODULE_4__.Display(this.memory);
-        this.soundCard = new _SoundCard__WEBPACK_IMPORTED_MODULE_8__.SoundCard();
-        this.disassembler = new _Disassembler__WEBPACK_IMPORTED_MODULE_3__.Disassembler();
+        this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_6__.Keyboard();
+        this.display = new _Display__WEBPACK_IMPORTED_MODULE_5__.Display(this.memory);
+        this.soundCard = new _SoundCard__WEBPACK_IMPORTED_MODULE_9__.SoundCard();
+        this.disassembler = new _Disassembler__WEBPACK_IMPORTED_MODULE_4__.Disassembler();
 
     }
 
     loadCharSet(){
-        this.memory.memory.set(_constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__.CHAR_SET,_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.CHAR_SET_ADDRESS);
+        this.memory.memory.set(_constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__.CHAR_SET,_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_2__.CHAR_SET_ADDRESS);
     }
 
     loadRom(romBuffer){
-        console.assert(romBuffer.length + _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS<=_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE, "This rom is too large")
-        this.memory.memory.set(romBuffer, _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS);
-        this.registers.PC = _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS;
+        console.assert(romBuffer.length + _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_2__.LOAD_PROGRAM_ADDRESS<=_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_2__.MEMORY_SIZE, "This rom is too large")
+        this.memory.memory.set(romBuffer, _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_2__.LOAD_PROGRAM_ADDRESS);
+        this.registers.PC = _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_2__.LOAD_PROGRAM_ADDRESS;
     }
 
-    execute(opcode){
+    async execute(opcode){
         const {instruction, args} = this.disassembler.disassemble(opcode);
         const {id} = instruction;
         console.log('i', instruction,'a',args,'id',id);
@@ -146,14 +148,46 @@ class Chip8{
                 );
                 this.registers.V[0x0f] = collision;
                 break;    
-
+            case 'SKP_VX':
+                if(this.keyboard.isKeyDown(this.registers.V[args[0]])){
+                    this.registers.PC += 2;
+                }
+                break; 
+            case 'SKNP_VX':
+                if(!this.keyboard.isKeyDown(this.registers.V[args[0]])){
+                    this.registers.PC += 2;
+                }
+                break; 
+            case 'LD_VX_DT':
+                this.registers.V[args[0]]=this.registers.DT;
+                break;
+            case 'LD_VX_K':
+                let keyPressed = this.keyboard.hasKeyDown();
+                while(keyPressed===-1){
+                    keyPressed = this.keyboard.hasKeyDown();
+                    await this.sleep();
+                }
+                this.registers.V[args[0]] = keyPressed;
+                break;
+            case 'LD_DT_VX':
+                this.registers.DT = this.registers.V[args[0]];
+                break;
+            case 'LD_ST_VX':
+                this.registers.ST = this.registers.V[args[0]];
+                break;
+            case 'ADD_I_VX':
+                this.registers.I += this.registers.V[args[0]];
+                break;
+            case 'LD_F_VX':
+                this.registers.I = this.registers.V[args[0]] * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.SPRITE_HEIGHT;
+                break;
             default:
                 console.error(`Instuction with ${id} not found.`,instruction,args);
         }
     }
 
 
-    async sleep(ms = _constants_registersConstants__WEBPACK_IMPORTED_MODULE_2__.TIMER_60_HZ){
+    async sleep(ms = _constants_registersConstants__WEBPACK_IMPORTED_MODULE_3__.TIMER_60_HZ){
         return new Promise((resolve)=> setTimeout(resolve,ms));
     }
 }
@@ -637,13 +671,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DISPLAY_HEIGHT": () => (/* binding */ DISPLAY_HEIGHT),
 /* harmony export */   "DISPLAY_MULTIPLY": () => (/* binding */ DISPLAY_MULTIPLY),
 /* harmony export */   "BG_COLOR": () => (/* binding */ BG_COLOR),
-/* harmony export */   "COLOR": () => (/* binding */ COLOR)
+/* harmony export */   "COLOR": () => (/* binding */ COLOR),
+/* harmony export */   "SPRITE_HEIGHT": () => (/* binding */ SPRITE_HEIGHT)
 /* harmony export */ });
 const DISPLAY_WIDTH = 64;
 const DISPLAY_HEIGHT = 32;
 const DISPLAY_MULTIPLY = 10;
 const BG_COLOR = '#000';
 const COLOR = '#3f6';
+const SPRITE_HEIGHT = 5;
 
 /***/ }),
 /* 9 */
@@ -684,7 +720,7 @@ class Keyboard{
     }
 
     hasKeyDown(){
-        return this.keys.findIndex((keyValue)=>keyValue) != -1;
+        return this.keys.findIndex((keyValue)=>keyValue);
     }
 }
 
@@ -944,14 +980,20 @@ const arrayBuffer = await rom.arrayBuffer();
 const romBuffer = new Uint8Array(arrayBuffer);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
 chip8.registers.PC = 0x010;
-chip8.registers.I= 0x0a;
-chip8.registers.V[0] = 62; // Asse delle X
-chip8.registers.V[5] = 28; // Y
-chip8.registers.V[8] = 0x03; // X
+chip8.registers.DT = 0x0;
+chip8.registers.I= 0x02;
+chip8.registers.V[0] = 0xf; // Asse delle X
 
 
-chip8.execute(0xd505);
-console.log('pc', chip8.registers.PC, 'sp', chip8.registers.SP);
+chip8.registers.V[5] = 0x10; // Y
+chip8.registers.V[8] = 0x10; // Y
+
+chip8.execute(0xf029);
+chip8.execute(0xd585);
+
+console.log('I', chip8.registers.I.toString(16), 'V0', chip8.registers.V[0]);
+
+
 
 
 

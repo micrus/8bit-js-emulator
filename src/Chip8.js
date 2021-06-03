@@ -1,4 +1,5 @@
 import { CHAR_SET } from "./constants/charSetConstants";
+import { DISPLAY_HEIGHT, SPRITE_HEIGHT } from "./constants/displayConstants";
 import { CHAR_SET_ADDRESS, LOAD_PROGRAM_ADDRESS, MEMORY_SIZE } from "./constants/memoryConstants";
 import { TIMER_60_HZ } from "./constants/registersConstants";
 import { Disassembler } from "./Disassembler";
@@ -32,7 +33,7 @@ export class Chip8{
         this.registers.PC = LOAD_PROGRAM_ADDRESS;
     }
 
-    execute(opcode){
+    async execute(opcode){
         const {instruction, args} = this.disassembler.disassemble(opcode);
         const {id} = instruction;
         console.log('i', instruction,'a',args,'id',id);
@@ -126,7 +127,39 @@ export class Chip8{
                 );
                 this.registers.V[0x0f] = collision;
                 break;    
-
+            case 'SKP_VX':
+                if(this.keyboard.isKeyDown(this.registers.V[args[0]])){
+                    this.registers.PC += 2;
+                }
+                break; 
+            case 'SKNP_VX':
+                if(!this.keyboard.isKeyDown(this.registers.V[args[0]])){
+                    this.registers.PC += 2;
+                }
+                break; 
+            case 'LD_VX_DT':
+                this.registers.V[args[0]]=this.registers.DT;
+                break;
+            case 'LD_VX_K':
+                let keyPressed = this.keyboard.hasKeyDown();
+                while(keyPressed===-1){
+                    keyPressed = this.keyboard.hasKeyDown();
+                    await this.sleep();
+                }
+                this.registers.V[args[0]] = keyPressed;
+                break;
+            case 'LD_DT_VX':
+                this.registers.DT = this.registers.V[args[0]];
+                break;
+            case 'LD_ST_VX':
+                this.registers.ST = this.registers.V[args[0]];
+                break;
+            case 'ADD_I_VX':
+                this.registers.I += this.registers.V[args[0]];
+                break;
+            case 'LD_F_VX':
+                this.registers.I = this.registers.V[args[0]] * SPRITE_HEIGHT;
+                break;
             default:
                 console.error(`Instuction with ${id} not found.`,instruction,args);
         }

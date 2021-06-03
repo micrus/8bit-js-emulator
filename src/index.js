@@ -13,14 +13,20 @@ const arrayBuffer = await rom.arrayBuffer();
 const romBuffer = new Uint8Array(arrayBuffer);
 const chip8 = new Chip8(romBuffer);
 chip8.registers.PC = 0x010;
-chip8.registers.I= 0x0a;
-chip8.registers.V[0] = 62; // Asse delle X
-chip8.registers.V[5] = 28; // Y
-chip8.registers.V[8] = 0x03; // X
+chip8.registers.DT = 0x0;
+chip8.registers.I= 0x02;
+chip8.registers.V[0] = 0xf; // Asse delle X
 
 
-chip8.execute(0xd505);
-console.log('pc', chip8.registers.PC, 'sp', chip8.registers.SP);
+chip8.registers.V[5] = 0x10; // Y
+chip8.registers.V[8] = 0x10; // Y
+
+chip8.execute(0xf029);
+chip8.execute(0xd585);
+
+console.log('I', chip8.registers.I.toString(16), 'V0', chip8.registers.V[0]);
+
+
 
 
 
