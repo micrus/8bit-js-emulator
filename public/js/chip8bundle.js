@@ -124,9 +124,28 @@ class Chip8{
                 this.registers.V[0x0f] = Boolean(this.registers.V[args[0]] & 0x80);
                 this.registers.V[args[0]] <<= 1;
                 break;   
-                
-                
-
+            case 'SNE_VX_VY':
+                if(this.registers.V[args[0]] !== this.registers.V[args[1]]){this.registers.PC += 2;}
+                break;               
+            case 'LD_I_ADDR':
+                this.registers.I = args[0];
+                break;     
+            case 'JP_V0_ADDR':
+                this.registers.PC = this.registers.V[0]+args[0];
+                break; 
+            case 'RND_VX_KK':
+                const random = Math.floor(Math.random() * 0xff);
+                this.registers.V[args[0]] = args[1] & random;
+                break;     
+            case 'DRW_VX_VY_N':
+                const collision = this.display.drawSprite(
+                    this.registers.V[args[1]],
+                    this.registers.V[args[0]],
+                    this.registers.I,
+                    args[2]
+                );
+                this.registers.V[0x0f] = collision;
+                break;    
 
             default:
                 console.error(`Instuction with ${id} not found.`,instruction,args);
@@ -416,7 +435,7 @@ const INSTRUCTION_SET = [
     },
     {
         key: 22,
-        id: 'RND_VX',
+        id: 'RND_VX_KK',
         name: 'RND',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0xc000,
@@ -583,14 +602,26 @@ class Display {
   }
 
   drawSprite(x, y, spriteLocation, spriteLen){
+    let pixelCollision = 0;
     for(let h = 0; h<spriteLen; h++){
       const line = this.memory.memory[spriteLocation+h];
       for(let w=0; w<_constants_charSetConstants__WEBPACK_IMPORTED_MODULE_1__.CHAR_SET_WIDTH; w++){
         const bitToCheck = (0b10000000 >> w);
         const value = line & bitToCheck;
-        this.drawPixel(h+y, x+w, value);
+        const ph = (h+y) % _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT;
+        const pw = (x+w) % _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH;
+        if (value === 0){
+          continue;
+        }
+        if (this.frameBuffer[ph][pw]===1){
+          pixelCollision =1;
+        }
+        this.frameBuffer[ph][pw]^=1;
+        //this.drawPixel(ph, pw, value);
       }
     }
+    this.drawBuffer();
+    return pixelCollision;
   }
 
 }
@@ -912,9 +943,14 @@ const rom = await fetch('./roms/test_opcode.ch8');
 const arrayBuffer = await rom.arrayBuffer();
 const romBuffer = new Uint8Array(arrayBuffer);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
+chip8.registers.PC = 0x010;
+chip8.registers.I= 0x0a;
+chip8.registers.V[0] = 62; // Asse delle X
+chip8.registers.V[5] = 28; // Y
+chip8.registers.V[8] = 0x03; // X
 
 
-chip8.execute(0x21aa);
+chip8.execute(0xd505);
 console.log('pc', chip8.registers.PC, 'sp', chip8.registers.SP);
 
 

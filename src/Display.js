@@ -56,14 +56,26 @@ export class Display {
   }
 
   drawSprite(x, y, spriteLocation, spriteLen){
+    let pixelCollision = 0;
     for(let h = 0; h<spriteLen; h++){
       const line = this.memory.memory[spriteLocation+h];
       for(let w=0; w<CHAR_SET_WIDTH; w++){
         const bitToCheck = (0b10000000 >> w);
         const value = line & bitToCheck;
-        this.drawPixel(h+y, x+w, value);
+        const ph = (h+y) % DISPLAY_HEIGHT;
+        const pw = (x+w) % DISPLAY_WIDTH;
+        if (value === 0){
+          continue;
+        }
+        if (this.frameBuffer[ph][pw]===1){
+          pixelCollision =1;
+        }
+        this.frameBuffer[ph][pw]^=1;
+        //this.drawPixel(ph, pw, value);
       }
     }
+    this.drawBuffer();
+    return pixelCollision;
   }
 
 }

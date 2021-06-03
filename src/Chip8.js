@@ -104,9 +104,28 @@ export class Chip8{
                 this.registers.V[0x0f] = Boolean(this.registers.V[args[0]] & 0x80);
                 this.registers.V[args[0]] <<= 1;
                 break;   
-                
-                
-
+            case 'SNE_VX_VY':
+                if(this.registers.V[args[0]] !== this.registers.V[args[1]]){this.registers.PC += 2;}
+                break;               
+            case 'LD_I_ADDR':
+                this.registers.I = args[0];
+                break;     
+            case 'JP_V0_ADDR':
+                this.registers.PC = this.registers.V[0]+args[0];
+                break; 
+            case 'RND_VX_KK':
+                const random = Math.floor(Math.random() * 0xff);
+                this.registers.V[args[0]] = args[1] & random;
+                break;     
+            case 'DRW_VX_VY_N':
+                const collision = this.display.drawSprite(
+                    this.registers.V[args[1]],
+                    this.registers.V[args[0]],
+                    this.registers.I,
+                    args[2]
+                );
+                this.registers.V[0x0f] = collision;
+                break;    
 
             default:
                 console.error(`Instuction with ${id} not found.`,instruction,args);

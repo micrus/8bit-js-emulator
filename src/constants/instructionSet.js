@@ -180,7 +180,7 @@ export const INSTRUCTION_SET = [
     },
     {
         key: 22,
-        id: 'RND_VX',
+        id: 'RND_VX_KK',
         name: 'RND',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0xc000,
