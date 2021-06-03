@@ -795,12 +795,12 @@ __webpack_require__.r(__webpack_exports__);
 class Registers{
     constructor(){
         console.log("Create new Registers");
-        this.V = new Int8Array(_constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__.NUMBER_OF_REGISTERS);
+        this.V = new Uint8Array(_constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__.NUMBER_OF_REGISTERS);
         this.I = 0;
         this.DT = 0;
         this.ST = 0;
         this.PC = _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__.LOAD_PROGRAM_ADDRESS;
-        this.stack = new Int16Array(_constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__.STACK_SIZE);
+        this.stack = new Uint16Array(_constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__.STACK_SIZE);
         this.SP = -1;
         this.reset();
     }
@@ -982,7 +982,7 @@ const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
 chip8.registers.PC = 0x010;
 chip8.registers.DT = 0x0;
 chip8.registers.I= 0x02;
-chip8.registers.V[0] = 0xf; // Asse delle X
+chip8.registers.V[0] = 0xff; // Asse delle X
 
 
 chip8.registers.V[5] = 0x10; // Y

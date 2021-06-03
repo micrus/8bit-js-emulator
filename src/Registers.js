@@ -4,12 +4,12 @@ import { NUMBER_OF_REGISTERS, STACK_SIZE } from "./constants/registersConstants"
 export class Registers{
     constructor(){
         console.log("Create new Registers");
-        this.V = new Int8Array(NUMBER_OF_REGISTERS);
+        this.V = new Uint8Array(NUMBER_OF_REGISTERS);
         this.I = 0;
         this.DT = 0;
         this.ST = 0;
         this.PC = LOAD_PROGRAM_ADDRESS;
-        this.stack = new Int16Array(STACK_SIZE);
+        this.stack = new Uint16Array(STACK_SIZE);
         this.SP = -1;
         this.reset();
     }

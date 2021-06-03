@@ -15,7 +15,7 @@ const chip8 = new Chip8(romBuffer);
 chip8.registers.PC = 0x010;
 chip8.registers.DT = 0x0;
 chip8.registers.I= 0x02;
-chip8.registers.V[0] = 0xf; // Asse delle X
+chip8.registers.V[0] = 0xff; // Asse delle X
 
 
 chip8.registers.V[5] = 0x10; // Y
