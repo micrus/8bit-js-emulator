@@ -86,19 +86,19 @@ export class Chip8{
                 this.registers.V[args[0]] ^= this.registers.V[args[1]]; 
                 break;              
             case 'ADD_VX_VY':
-                this.registers.V[0x0f] = (this.registers.V[args[0]]+this.registers.V[args[1]]>0xff)?1:0;
+                this.registers.V[0x0f] = this.registers.V[args[0]]+this.registers.V[args[1]]>0xff;
                 this.registers.V[args[0]]+=this.registers.V[args[1]];
                 break;              
             case 'SUB_VX_VY':
-                this.registers.V[0x0f] = (this.registers.V[args[0]]>this.registers.V[args[1]])?1:0;
-                this.registers.V[args[0]]-=this.registers.V[args[1]];
+                this.registers.V[0x0f] = this.registers.V[args[0]]>this.registers.V[args[1]];
+                this.registers.V[args[0]] -= this.registers.V[args[1]];
                 break; 
             case 'SHR_VX_VY':
-                this.registers.V[0x0f] = (this.registers.V[args[0]] & 0x01);
+                this.registers.V[0x0f] = this.registers.V[args[0]] & 0x01;
                 this.registers.V[args[0]] >>= 1;
                 break;
             case 'SUBN_VX_VY':
-                this.registers.V[0x0f] = (this.registers.V[args[1]]+this.registers.V[args[0]]>0xff)?1:0;
+                this.registers.V[0x0f] = this.registers.V[args[1]]+this.registers.V[args[0]]>0xff;
                 this.registers.V[args[0]] = this.registers.V[args[1]]-this.registers.V[args[0]];
                 break;
             case 'SHL_VX_VY':
@@ -120,8 +120,8 @@ export class Chip8{
                 break;     
             case 'DRW_VX_VY_N':
                 const collision = this.display.drawSprite(
-                    this.registers.V[args[1]],
                     this.registers.V[args[0]],
+                    this.registers.V[args[1]],
                     this.registers.I,
                     args[2]
                 );
@@ -141,8 +141,8 @@ export class Chip8{
                 this.registers.V[args[0]]=this.registers.DT;
                 break;
             case 'LD_VX_K':
-                let keyPressed = this.keyboard.hasKeyDown();
-                while(keyPressed===-1){
+                let keyPressed = -1;
+                while(keyPressed=== -1){
                     keyPressed = this.keyboard.hasKeyDown();
                     await this.sleep();
                 }
@@ -172,12 +172,12 @@ export class Chip8{
                 break;
             case 'LD_I_VX':
                 for(let i = 0; i <= args[0]; i++){
-                    this.memory.memory[this.registers.I + i] = this.registers.V[i];
+                    this.memory.setMemory(this.registers.I + i, this.registers.V[i]);
                 }
                 break;
             case 'LD_VX_I':
                 for(let i = 0; i<= args[0]; i++){
-                    this.registers.V[i] = this.memory.memory[this.registers.I + i];
+                    this.registers.V[i] = this.memory.getMemory(this.registers.I + i);
                 }
                 break;
             default:

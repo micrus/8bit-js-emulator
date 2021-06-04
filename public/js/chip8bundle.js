@@ -107,19 +107,19 @@ class Chip8{
                 this.registers.V[args[0]] ^= this.registers.V[args[1]]; 
                 break;              
             case 'ADD_VX_VY':
-                this.registers.V[0x0f] = (this.registers.V[args[0]]+this.registers.V[args[1]]>0xff)?1:0;
+                this.registers.V[0x0f] = this.registers.V[args[0]]+this.registers.V[args[1]]>0xff;
                 this.registers.V[args[0]]+=this.registers.V[args[1]];
                 break;              
             case 'SUB_VX_VY':
-                this.registers.V[0x0f] = (this.registers.V[args[0]]>this.registers.V[args[1]])?1:0;
-                this.registers.V[args[0]]-=this.registers.V[args[1]];
+                this.registers.V[0x0f] = this.registers.V[args[0]]>this.registers.V[args[1]];
+                this.registers.V[args[0]] -= this.registers.V[args[1]];
                 break; 
             case 'SHR_VX_VY':
-                this.registers.V[0x0f] = (this.registers.V[args[0]] & 0x01);
+                this.registers.V[0x0f] = this.registers.V[args[0]] & 0x01;
                 this.registers.V[args[0]] >>= 1;
                 break;
             case 'SUBN_VX_VY':
-                this.registers.V[0x0f] = (this.registers.V[args[1]]+this.registers.V[args[0]]>0xff)?1:0;
+                this.registers.V[0x0f] = this.registers.V[args[1]]+this.registers.V[args[0]]>0xff;
                 this.registers.V[args[0]] = this.registers.V[args[1]]-this.registers.V[args[0]];
                 break;
             case 'SHL_VX_VY':
@@ -141,8 +141,8 @@ class Chip8{
                 break;     
             case 'DRW_VX_VY_N':
                 const collision = this.display.drawSprite(
-                    this.registers.V[args[1]],
                     this.registers.V[args[0]],
+                    this.registers.V[args[1]],
                     this.registers.I,
                     args[2]
                 );
@@ -162,8 +162,8 @@ class Chip8{
                 this.registers.V[args[0]]=this.registers.DT;
                 break;
             case 'LD_VX_K':
-                let keyPressed = this.keyboard.hasKeyDown();
-                while(keyPressed===-1){
+                let keyPressed = -1;
+                while(keyPressed=== -1){
                     keyPressed = this.keyboard.hasKeyDown();
                     await this.sleep();
                 }
@@ -193,12 +193,12 @@ class Chip8{
                 break;
             case 'LD_I_VX':
                 for(let i = 0; i <= args[0]; i++){
-                    this.memory.memory[this.registers.I + i] = this.registers.V[i];
+                    this.memory.setMemory(this.registers.I + i, this.registers.V[i]);
                 }
                 break;
             case 'LD_VX_I':
                 for(let i = 0; i<= args[0]; i++){
-                    this.registers.V[i] = this.memory.memory[this.registers.I + i];
+                    this.registers.V[i] = this.memory.getMemory(this.registers.I + i);
                 }
                 break;
             default:
@@ -307,7 +307,7 @@ class Disassembler{
     
     disassemble(opcode){
         const instruction = _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__.INSTRUCTION_SET.find(instruction => (opcode & instruction.mask) === instruction.pattern);
-        const args = instruction.args.map(arg => (opcode & arg.mask)>>arg.shift);
+        const args = instruction.args.map( (arg) => (opcode & arg.mask)>>arg.shift);
         return {instruction, args};
     }
 }
@@ -996,62 +996,33 @@ runChip8();
 async function runChip8() {
 
 const rom = await fetch('./roms/test_opcode.ch8');
+//const rom = await fetch('./roms/SCTEST.ch8');
+//const rom = await fetch('./roms/1dcell.ch8');
+
 const arrayBuffer = await rom.arrayBuffer();
 const romBuffer = new Uint8Array(arrayBuffer);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
-chip8.registers.PC = 0x010;
-chip8.registers.DT = 0x0;
-chip8.registers.I= 0x100;
-chip8.registers.V[0] = 7; // Asse delle X
-chip8.registers.V[1] = 2; // Asse delle X
-chip8.registers.V[2] = 3; // Asse delle X
-chip8.registers.V[3] = 0xf; // Asse delle X
+
+while (1) {
+await chip8.sleep();
+if (chip8.registers.DT > 0) {
+  await chip8.sleep();
+  chip8.registers.DT--;
+}
+if (chip8.registers.ST > 0) {
+  chip8.soundCard.enableSound();
+  await chip8.sleep();
+  chip8.registers.ST--;
+}
+if (chip8.registers.ST === 0) {
+  chip8.soundCard.disableSound();
+}
+let opcode = chip8.memory.getOpcode(chip8.registers.PC);
+await chip8.execute(opcode);
+chip8.registers.PC +=2;
+}
 
 
-chip8.registers.V[5] = 0x10; // Y
-chip8.registers.V[8] = 0x10; // Y
-
-chip8.execute(0xf455);
-chip8.registers.V[0] = 0; // Asse delle X
-chip8.registers.V[1] = 0; // Asse delle X
-chip8.registers.V[2] = 0; // Asse delle X
-chip8.registers.V[3] = 0; // Asse delle X
-chip8.execute(0xf465);
-
-console.log(chip8.registers.V[0]);
-console.log(chip8.registers.V[1]);
-console.log(chip8.registers.V[2]);
-console.log(chip8.registers.V[3]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /* 
-    chip8.registers.ST = 10;
-    while (1) {
-    await chip8.sleep(200);
-    if (chip8.registers.DT > 0) {
-      await chip8.sleep();
-      chip8.registers.DT--;
-    }
-    if (chip8.registers.ST > 0) {
-      chip8.soundCard.enableSound();
-      await chip8.sleep();
-      chip8.registers.ST--;
-    }
-    if (chip8.registers.ST === 0) {
-      chip8.soundCard.disableSound();
-    }
-  } */
 }
 
 })();
