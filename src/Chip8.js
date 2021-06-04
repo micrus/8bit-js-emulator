@@ -160,6 +160,26 @@ export class Chip8{
             case 'LD_F_VX':
                 this.registers.I = this.registers.V[args[0]] * SPRITE_HEIGHT;
                 break;
+            case 'LD_B_VX':
+                let x = this.registers.V[args[0]];
+                const hundreds = Math.floor(x/100);
+                x = x - hundreds * 100;
+                const tens = Math.floor(x/10);
+                const ones = x - tens * 10;
+                this.memory.memory[this.registers.I] = hundreds;
+                this.memory.memory[this.registers.I+1] = tens;
+                this.memory.memory[this.registers.I+2] = ones;
+                break;
+            case 'LD_I_VX':
+                for(let i = 0; i <= args[0]; i++){
+                    this.memory.memory[this.registers.I + i] = this.registers.V[i];
+                }
+                break;
+            case 'LD_VX_I':
+                for(let i = 0; i<= args[0]; i++){
+                    this.registers.V[i] = this.memory.memory[this.registers.I + i];
+                }
+                break;
             default:
                 console.error(`Instuction with ${id} not found.`,instruction,args);
         }

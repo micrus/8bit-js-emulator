@@ -10,11 +10,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Chip8": () => (/* binding */ Chip8)
 /* harmony export */ });
 /* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
-/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
-/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
-/* harmony import */ var _Disassembler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
-/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
+/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+/* harmony import */ var _Disassembler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
+/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
 /* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9);
 /* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(11);
 /* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(12);
@@ -181,6 +181,26 @@ class Chip8{
             case 'LD_F_VX':
                 this.registers.I = this.registers.V[args[0]] * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.SPRITE_HEIGHT;
                 break;
+            case 'LD_B_VX':
+                let x = this.registers.V[args[0]];
+                const hundreds = Math.floor(x/100);
+                x = x - hundreds * 100;
+                const tens = Math.floor(x/10);
+                const ones = x - tens * 10;
+                this.memory.memory[this.registers.I] = hundreds;
+                this.memory.memory[this.registers.I+1] = tens;
+                this.memory.memory[this.registers.I+2] = ones;
+                break;
+            case 'LD_I_VX':
+                for(let i = 0; i <= args[0]; i++){
+                    this.memory.memory[this.registers.I + i] = this.registers.V[i];
+                }
+                break;
+            case 'LD_VX_I':
+                for(let i = 0; i<= args[0]; i++){
+                    this.registers.V[i] = this.memory.memory[this.registers.I + i];
+                }
+                break;
             default:
                 console.error(`Instuction with ${id} not found.`,instruction,args);
         }
@@ -227,6 +247,26 @@ const CHAR_SET = [
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DISPLAY_WIDTH": () => (/* binding */ DISPLAY_WIDTH),
+/* harmony export */   "DISPLAY_HEIGHT": () => (/* binding */ DISPLAY_HEIGHT),
+/* harmony export */   "DISPLAY_MULTIPLY": () => (/* binding */ DISPLAY_MULTIPLY),
+/* harmony export */   "BG_COLOR": () => (/* binding */ BG_COLOR),
+/* harmony export */   "COLOR": () => (/* binding */ COLOR),
+/* harmony export */   "SPRITE_HEIGHT": () => (/* binding */ SPRITE_HEIGHT)
+/* harmony export */ });
+const DISPLAY_WIDTH = 64;
+const DISPLAY_HEIGHT = 32;
+const DISPLAY_MULTIPLY = 10;
+const BG_COLOR = '#000';
+const COLOR = '#3f6';
+const SPRITE_HEIGHT = 5;
+
+/***/ }),
+/* 4 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "MEMORY_SIZE": () => (/* binding */ MEMORY_SIZE),
 /* harmony export */   "LOAD_PROGRAM_ADDRESS": () => (/* binding */ LOAD_PROGRAM_ADDRESS),
 /* harmony export */   "CHAR_SET_ADDRESS": () => (/* binding */ CHAR_SET_ADDRESS)
@@ -236,7 +276,7 @@ const LOAD_PROGRAM_ADDRESS = 0x200;
 const CHAR_SET_ADDRESS = 0x000;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -250,14 +290,14 @@ const STACK_SIZE = 16;
 const TIMER_60_HZ = 1000 / 16;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Disassembler": () => (/* binding */ Disassembler)
 /* harmony export */ });
-/* harmony import */ var _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 
 
 class Disassembler{
@@ -273,7 +313,7 @@ class Disassembler{
 }
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -575,14 +615,14 @@ const INSTRUCTION_SET = [
 ];
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Display": () => (/* binding */ Display)
 /* harmony export */ });
-/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
+/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 
 
@@ -662,26 +702,6 @@ class Display {
 
 
 /***/ }),
-/* 8 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DISPLAY_WIDTH": () => (/* binding */ DISPLAY_WIDTH),
-/* harmony export */   "DISPLAY_HEIGHT": () => (/* binding */ DISPLAY_HEIGHT),
-/* harmony export */   "DISPLAY_MULTIPLY": () => (/* binding */ DISPLAY_MULTIPLY),
-/* harmony export */   "BG_COLOR": () => (/* binding */ BG_COLOR),
-/* harmony export */   "COLOR": () => (/* binding */ COLOR),
-/* harmony export */   "SPRITE_HEIGHT": () => (/* binding */ SPRITE_HEIGHT)
-/* harmony export */ });
-const DISPLAY_WIDTH = 64;
-const DISPLAY_HEIGHT = 32;
-const DISPLAY_MULTIPLY = 10;
-const BG_COLOR = '#000';
-const COLOR = '#3f6';
-const SPRITE_HEIGHT = 5;
-
-/***/ }),
 /* 9 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -744,7 +764,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Memory": () => (/* binding */ Memory)
 /* harmony export */ });
-/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 
 
 class Memory{
@@ -787,8 +807,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Registers": () => (/* binding */ Registers)
 /* harmony export */ });
-/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
-/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
 
 
 
@@ -981,17 +1001,29 @@ const romBuffer = new Uint8Array(arrayBuffer);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
 chip8.registers.PC = 0x010;
 chip8.registers.DT = 0x0;
-chip8.registers.I= 0x02;
-chip8.registers.V[0] = 0xff; // Asse delle X
+chip8.registers.I= 0x100;
+chip8.registers.V[0] = 7; // Asse delle X
+chip8.registers.V[1] = 2; // Asse delle X
+chip8.registers.V[2] = 3; // Asse delle X
+chip8.registers.V[3] = 0xf; // Asse delle X
 
 
 chip8.registers.V[5] = 0x10; // Y
 chip8.registers.V[8] = 0x10; // Y
 
-chip8.execute(0xf029);
-chip8.execute(0xd585);
+chip8.execute(0xf455);
+chip8.registers.V[0] = 0; // Asse delle X
+chip8.registers.V[1] = 0; // Asse delle X
+chip8.registers.V[2] = 0; // Asse delle X
+chip8.registers.V[3] = 0; // Asse delle X
+chip8.execute(0xf465);
 
-console.log('I', chip8.registers.I.toString(16), 'V0', chip8.registers.V[0]);
+console.log(chip8.registers.V[0]);
+console.log(chip8.registers.V[1]);
+console.log(chip8.registers.V[2]);
+console.log(chip8.registers.V[3]);
+
+
 
 
 
