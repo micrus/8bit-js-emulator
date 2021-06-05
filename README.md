@@ -1,4 +1,4 @@
-Work in progress... not finished
+A personal javascript advanced project, this is an emulator of the well known CHIP-8 programming language written in vanilla javascript to make it able to run completely on browser. 
 
 # CHIP-8
 
